@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { DragDropContext } from '@hello-pangea/dnd';
-import { startOfDay, format, parse, addDays } from 'date-fns';
+import { format, parse } from 'date-fns';
 import CalendarHeader from './CalendarHeader';
 import MonthView from './MonthView';
 import WeekView from './WeekView';
