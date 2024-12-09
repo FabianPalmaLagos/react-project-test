@@ -1,5 +1,6 @@
 import React from 'react';
 import { format, addHours, startOfDay, isSameDay } from 'date-fns';
+import { Droppable, Draggable } from '@hello-pangea/dnd';
 
 const DayView = ({ selectedDate, events, onEventClick }) => {
   const timeSlots = Array.from({ length: 24 }, (_, i) => i);
@@ -27,19 +28,45 @@ const DayView = ({ selectedDate, events, onEventClick }) => {
         </div>
         <div className="flex-1 border-l">
           {timeSlots.map(hour => (
-            <div key={hour} className="h-12 border-b relative">
-              {getEventsForTimeSlot(hour).map(event => (
+            <Droppable
+              key={`${format(selectedDate, 'yyyy-MM-dd')}-${hour}`}
+              droppableId={`day-${format(selectedDate, 'yyyy-MM-dd')}-${hour}`}
+            >
+              {(provided, snapshot) => (
                 <div
-                  key={event.id}
-                  onClick={() => onEventClick(event)}
-                  className="absolute inset-x-0 bg-blue-100 text-blue-700 rounded p-1 text-sm mx-2 cursor-pointer hover:bg-blue-200"
-                  style={{ top: '0.25rem', bottom: '0.25rem' }}
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  className={`h-12 border-b relative ${snapshot.isDraggingOver ? 'bg-blue-50' : ''}`}
                 >
-                  <div className="font-medium">{event.title}</div>
-                  <div className="text-xs truncate">{event.description}</div>
+                  {getEventsForTimeSlot(hour).map((event, index) => (
+                    <Draggable
+                      key={event.id}
+                      draggableId={event.id}
+                      index={index}
+                    >
+                      {(provided, snapshot) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          onClick={() => onEventClick(event)}
+                          className={`absolute inset-x-0 mx-2 rounded p-1 cursor-pointer transition-colors ${snapshot.isDragging ? 'bg-blue-200 text-blue-800' : 'bg-blue-100 text-blue-700 hover:bg-blue-200'}`}
+                          style={{
+                            top: '0.25rem',
+                            bottom: '0.25rem',
+                            ...provided.draggableProps.style
+                          }}
+                        >
+                          <div className="font-medium text-sm">{event.title}</div>
+                          <div className="text-xs truncate">{event.description}</div>
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
                 </div>
-              ))}
-            </div>
+              )}
+            </Droppable>
           ))}
         </div>
       </div>
