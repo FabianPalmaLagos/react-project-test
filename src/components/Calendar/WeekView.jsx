@@ -1,12 +1,11 @@
 import React from 'react';
 import { startOfWeek, endOfWeek, eachDayOfInterval, format, isSameDay, addHours, startOfDay } from 'date-fns';
+import { Droppable, Draggable } from '@hello-pangea/dnd';
 
 const WeekView = ({ selectedDate, events, onEventClick }) => {
   const weekStart = startOfWeek(selectedDate);
   const weekEnd = endOfWeek(weekStart);
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
-
-  // Generate time slots from 0:00 to 23:00
   const timeSlots = Array.from({ length: 24 }, (_, i) => i);
 
   const getEventsForTimeSlot = (day, hour) => {
@@ -45,18 +44,44 @@ const WeekView = ({ selectedDate, events, onEventClick }) => {
           {days.map(day => (
             <div key={day.toISOString()} className="flex-1 border-l">
               {timeSlots.map(hour => (
-                <div key={hour} className="h-12 border-b relative">
-                  {getEventsForTimeSlot(day, hour).map(event => (
+                <Droppable
+                  key={`${format(day, 'yyyy-MM-dd')}-${hour}`}
+                  droppableId={`day-${format(day, 'yyyy-MM-dd')}-${hour}`}
+                >
+                  {(provided, snapshot) => (
                     <div
-                      key={event.id}
-                      onClick={() => onEventClick(event)}
-                      className="absolute inset-x-0 bg-blue-100 text-blue-700 rounded p-1 text-sm truncate cursor-pointer hover:bg-blue-200 mx-1"
-                      style={{ top: '0.25rem', bottom: '0.25rem' }}
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                      className={`h-12 border-b relative ${snapshot.isDraggingOver ? 'bg-blue-50' : ''}`}
                     >
-                      {event.title}
+                      {getEventsForTimeSlot(day, hour).map((event, index) => (
+                        <Draggable
+                          key={event.id}
+                          draggableId={event.id}
+                          index={index}
+                        >
+                          {(provided, snapshot) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              onClick={() => onEventClick(event)}
+                              className={`absolute inset-x-0 mx-1 p-1 text-sm rounded truncate cursor-pointer transition-colors ${snapshot.isDragging ? 'bg-blue-200 text-blue-800' : 'bg-blue-100 text-blue-700 hover:bg-blue-200'}`}
+                              style={{
+                                top: '0.25rem',
+                                bottom: '0.25rem',
+                                ...provided.draggableProps.style
+                              }}
+                            >
+                              {event.title}
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
                     </div>
-                  ))}
-                </div>
+                  )}
+                </Droppable>
               ))}
             </div>
           ))}
