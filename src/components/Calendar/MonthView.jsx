@@ -1,5 +1,6 @@
 import React from 'react';
 import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, format, isSameMonth, isSameDay } from 'date-fns';
+import { Droppable, Draggable } from '@hello-pangea/dnd';
 
 const MonthView = ({ selectedDate, events, onEventClick, onDateClick }) => {
   const monthStart = startOfMonth(selectedDate);
@@ -21,31 +22,56 @@ const MonthView = ({ selectedDate, events, onEventClick, onDateClick }) => {
         </div>
       ))}
       {days.map(day => (
-        <div
+        <Droppable
           key={day.toISOString()}
-          onClick={() => onDateClick(day)}
-          className={`min-h-[120px] bg-white p-2 ${!isSameMonth(day, monthStart) ? 'text-gray-400' : ''}`}
+          droppableId={`day-${format(day, 'yyyy-MM-dd')}`}
         >
-          <div className="flex justify-between">
-            <span className={`text-sm ${isSameDay(day, new Date()) ? 'bg-calendar-blue text-white rounded-full w-6 h-6 flex items-center justify-center' : ''}`}>
-              {format(day, 'd')}
-            </span>
-          </div>
-          <div className="mt-1 space-y-1">
-            {getDayEvents(day).map(event => (
-              <div
-                key={event.id}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEventClick(event);
-                }}
-                className="text-sm p-1 bg-blue-100 text-blue-700 rounded truncate cursor-pointer hover:bg-blue-200"
-              >
-                {event.title}
+          {(provided, snapshot) => (
+            <div
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+              onClick={() => onDateClick(day)}
+              className={`min-h-[120px] bg-white p-2 ${!isSameMonth(day, monthStart) ? 'text-gray-400' : ''} ${
+                snapshot.isDraggingOver ? 'bg-blue-50' : ''
+              }`}
+            >
+              <div className="flex justify-between">
+                <span className={`text-sm ${isSameDay(day, new Date()) ? 'bg-calendar-blue text-white rounded-full w-6 h-6 flex items-center justify-center' : ''}`}>
+                  {format(day, 'd')}
+                </span>
               </div>
-            ))}
-          </div>
-        </div>
+              <div className="mt-1 space-y-1">
+                {getDayEvents(day).map((event, index) => (
+                  <Draggable
+                    key={event.id}
+                    draggableId={event.id}
+                    index={index}
+                  >
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEventClick(event);
+                        }}
+                        className={`text-sm p-1 rounded truncate cursor-pointer ${
+                          snapshot.isDragging
+                            ? 'bg-blue-200 text-blue-800'
+                            : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                        }`}
+                      >
+                        {event.title}
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            </div>
+          )}
+        </Droppable>
       ))}
     </div>
   );
