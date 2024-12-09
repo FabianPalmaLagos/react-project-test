@@ -49,12 +49,41 @@ cd react-project-test
 2. Install the dependencies:
 ```bash
 npm install
+
+# If you encounter any missing dependencies, run:
+npm install react-scripts --save-dev
+npm install date-fns @headlessui/react tailwindcss postcss autoprefixer
 ```
 
 3. Start the development server:
 ```bash
 npm start
 ```
+
+## 👏 Quick Start
+
+1. After installation, the application will run on `http://localhost:3000`
+2. Create events by clicking the "Create Event" button
+3. Switch between Month, Week, and Day views using the navigation buttons
+4. Navigate between time periods using the arrow buttons
+
+## 💡 Troubleshooting
+
+### Common Issues:
+
+1. **`react-scripts` not found:**
+   ```bash
+   npm install react-scripts --save-dev
+   ```
+
+2. **Missing dependencies:**
+   ```bash
+   npm install date-fns @headlessui/react tailwindcss postcss autoprefixer
+   ```
+
+3. **Module not found errors:**
+   - Ensure all component files are in the correct directory structure
+   - The project structure should match the one shown below
 
 ## 🏗️ Project Structure
 
@@ -68,8 +97,8 @@ src/
 │       ├── WeekView.jsx     # Weekly schedule view
 │       ├── DayView.jsx      # Daily schedule view
 │       └── EventModal.jsx   # Event creation/editing modal
-├── App.jsx
-└── index.js
+├── App.jsx              # Main application component
+└── index.js             # Application entry point
 ```
 
 ## 🎯 Usage
@@ -88,9 +117,7 @@ function App() {
 }
 ```
 
-### Managing Events
-
-Events are stored in the following format:
+### Event Data Structure
 
 ```javascript
 {
@@ -108,7 +135,6 @@ Events are stored in the following format:
 - `npm start` - Runs the app in development mode
 - `npm test` - Launches the test runner
 - `npm run build` - Builds the app for production
-- `npm run eject` - Ejects from Create React App
 
 ## 🛣️ Roadmap
 
@@ -136,7 +162,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👥 Authors
 
-- [Your Name] - Initial work - [FabianPalmaLagos](https://github.com/FabianPalmaLagos)
+- [Fabian Palma Lagos] - Initial work - [FabianPalmaLagos](https://github.com/FabianPalmaLagos)
 
 ## 🙏 Acknowledgments
 
